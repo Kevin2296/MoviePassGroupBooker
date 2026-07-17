@@ -137,6 +137,7 @@ form > .button.primary { width: 100%; min-height: 58px; font-size: 16px; }
 .room-banner small, .room-banner strong { display: block; }
 .room-banner small { color: var(--muted); font-size: 10px; font-weight: 850; letter-spacing: .18em; }
 .room-banner strong { margin-top: 4px; color: var(--gold-2); font-size: 29px; letter-spacing: .18em; }
+.activity-notice { margin: 14px 0 0; padding: 13px 15px; border: 1px solid rgba(85,214,139,.35); border-radius: 13px; color: #baf2d0; background: rgba(85,214,139,.1); font-weight: 800; }
 .room-showing { margin: 16px 0; padding: 13px 15px; border-radius: 13px; color: #d6d9e2; background: #0e1119; }
 .room-people { display: grid; gap: 9px; margin-bottom: 16px; }
 .room-person { display: grid; grid-template-columns: 34px 1fr auto; gap: 11px; align-items: center; padding: 11px 13px; border: 1px solid #2c3242; border-radius: 13px; }
@@ -146,6 +147,11 @@ form > .button.primary { width: 100%; min-height: 58px; font-size: 16px; }
 .room-person strong, .room-person small { display: block; }
 .room-person small { margin-top: 3px; color: var(--muted); }
 .room-person .person-status { color: var(--gold-2); font-size: 12px; font-weight: 800; }
+.booking-guide { margin: 0 0 16px; padding: 15px 17px; border: 1px solid #303648; border-radius: 14px; background: rgba(10,12,18,.52); }
+.booking-guide strong { color: var(--gold-2); }
+.booking-guide ol { margin: 10px 0 0; padding-left: 20px; color: #b9becb; font-size: 13px; line-height: 1.55; }
+.booking-guide li + li { margin-top: 5px; }
+.remove-participant { grid-column: 2 / -1; justify-self: end; padding: 5px 9px; border: 1px solid rgba(255,107,117,.3); border-radius: 8px; color: #ffadb3; background: rgba(255,107,117,.08); cursor: pointer; font-size: 11px; font-weight: 800; }
 
 .result { margin-top: 22px; }
 .result-head { display: flex; justify-content: space-between; gap: 20px; align-items: flex-start; }
@@ -194,4 +200,5 @@ footer a, .legal a { color: var(--gold-2); }
   .group-actions { flex-direction: column; }
   .group-actions .button { width: 100%; }
   .room-banner { align-items: stretch; flex-direction: column; }
+  .room-person { grid-template-columns: 28px 1fr auto; }
 }

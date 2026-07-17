@@ -27,6 +27,8 @@ let selectedShowing = null;
 let groupSession = null;
 let groupRoom = null;
 let roomPollTimer = null;
+let noticeTimer = null;
+let participantStatuses = new Map();
 
 function normalizeServer(value) {
   return String(value || '').trim().replace(/\/+$/, '');
@@ -103,8 +105,10 @@ async function pollRoom(firstLoad = false) {
     applyRoom(result.room);
     startRoomPolling();
   } catch (error) {
-    if (firstLoad) clearRoomLocal();
-    else showGroupError(error);
+    if (firstLoad || /uitnodiging|groep niet gevonden/i.test(error?.message || '')) {
+      clearRoomLocal();
+      showGroupError(error);
+    } else showGroupError(error);
   }
 }
 
@@ -113,6 +117,14 @@ function myParticipant() {
 }
 
 function applyRoom(room) {
+  const nextStatuses = new Map(room.participants.map(person => [person.id, person.status]));
+  room.participants.forEach(person => {
+    const previous = participantStatuses.get(person.id);
+    if (person.id !== room.me && previous && previous !== 'boeken' && person.status === 'boeken') {
+      showActivityNotice(`${person.name} is begonnen met boeken.`);
+    }
+  });
+  participantStatuses = nextStatuses;
   groupRoom = room;
   groupSetup.hidden = true;
   groupLive.hidden = false;
@@ -122,17 +134,39 @@ function applyRoom(room) {
   document.querySelector('#room-showing').textContent = showing
     ? `${showing.film} · ${showing.date} om ${showing.time} · Vue ${showing.cinema}`
     : 'De groepsleider kiest zo de voorstelling.';
+  const me = myParticipant();
+  form.hidden = me?.role !== 'host';
+  result.hidden = me?.role !== 'host' || !currentPlan;
   document.querySelector('#room-people').innerHTML = room.participants.map(person => `
     <article class="room-person" data-status="${escapeHtml(person.status)}">
       <span class="dot"></span>
       <div><strong>${escapeHtml(person.name)}${person.role === 'host' ? ' · groepsleider' : ''}</strong><small>${person.ticketType === 'moviepass' ? 'Movie Pass' : 'Gewoon ticket'}${person.seat ? ` · stoel ${escapeHtml(person.seat)}` : ''}</small></div>
       <span class="person-status">${escapeHtml(person.status)}</span>
+      ${me?.role === 'host' && person.id !== me.id ? `<button class="remove-participant" type="button" data-participant-id="${escapeHtml(person.id)}" data-participant-name="${escapeHtml(person.name)}">Verwijderen</button>` : ''}
     </article>`).join('');
-  const me = myParticipant();
-  roomBookButton.hidden = !showing;
-  roomDoneButton.hidden = !showing || !['booking', 'boeken'].includes(room.state) && me?.status !== 'boeken';
-  roomBookButton.textContent = me?.role === 'host' && room.state !== 'booking' ? 'Start alle boekingen' : 'Open mijn Vue-boeking';
+  document.querySelectorAll('.remove-participant').forEach(button => {
+    button.addEventListener('click', () => removeParticipant(button.dataset.participantId, button.dataset.participantName));
+  });
+  roomBookButton.hidden = !showing || (me?.role !== 'host' && room.state !== 'booking');
+  roomDoneButton.hidden = !showing || room.state !== 'booking' || me?.status !== 'boeken';
+  roomBookButton.textContent = me?.role === 'host' && room.state !== 'booking' ? 'Start samen boeken' : 'Open mijn Vue-bestelling';
   if (showing) selectedShowing = { ...showing };
+}
+
+function showActivityNotice(message) {
+  const notice = document.querySelector('#activity-notice');
+  notice.textContent = message;
+  notice.hidden = false;
+  clearTimeout(noticeTimer);
+  noticeTimer = setTimeout(() => { notice.hidden = true; }, 8000);
+  if (native?.showGroupNotice) native.showGroupNotice(message);
+}
+
+async function removeParticipant(participantId, name) {
+  if (!confirm(`${name} uit deze groep verwijderen?`)) return;
+  try {
+    await updateRoom('remove_participant', { participantId });
+  } catch (error) { showGroupError(error); }
 }
 
 async function updateRoom(action, extra = {}) {
@@ -147,9 +181,13 @@ function clearRoomLocal() {
   roomPollTimer = null;
   groupSession = null;
   groupRoom = null;
+  participantStatuses = new Map();
+  clearTimeout(noticeTimer);
+  document.querySelector('#activity-notice').hidden = true;
   localStorage.removeItem('moviepass-room-session');
   groupSetup.hidden = false;
   groupLive.hidden = true;
+  form.hidden = false;
   groupError.hidden = true;
 }
 

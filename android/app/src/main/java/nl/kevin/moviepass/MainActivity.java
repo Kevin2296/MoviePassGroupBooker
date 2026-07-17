@@ -4,14 +4,17 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.util.Base64;
 import android.view.Gravity;
 import android.view.View;
+import android.view.WindowInsets;
 import android.webkit.CookieManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebResourceRequest;
@@ -85,7 +88,7 @@ public class MainActivity extends Activity {
         settings.setAllowFileAccess(true);
         settings.setBuiltInZoomControls(false);
         settings.setDisplayZoomControls(false);
-        settings.setUserAgentString(settings.getUserAgentString() + " MoviePassGroepsboeker/0.6");
+        settings.setUserAgentString(settings.getUserAgentString() + " MoviePassGroepsboeker/0.7");
         CookieManager.getInstance().setAcceptCookie(true);
         CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true);
 
@@ -117,6 +120,13 @@ public class MainActivity extends Activity {
 
         root.addView(webView, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
         createActionBar(root);
+        root.setOnApplyWindowInsetsListener((view, insets) -> {
+            int navigationBottom = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+                    ? insets.getInsets(WindowInsets.Type.navigationBars()).bottom
+                    : insets.getSystemWindowInsetBottom();
+            actionBar.setPadding(dp(16), dp(13), dp(16), dp(16) + navigationBottom);
+            return insets;
+        });
         setContentView(root);
         loadLocalApp();
     }
@@ -138,8 +148,14 @@ public class MainActivity extends Activity {
         buttons.setOrientation(LinearLayout.HORIZONTAL);
         actionPrimary = new Button(this);
         actionSecondary = new Button(this);
-        buttons.addView(actionPrimary, new LinearLayout.LayoutParams(0, dp(48), 1));
-        LinearLayout.LayoutParams secondaryParams = new LinearLayout.LayoutParams(0, dp(48), 1);
+        actionPrimary.setAllCaps(false);
+        actionPrimary.setTextColor(Color.rgb(25, 19, 10));
+        actionPrimary.setBackgroundTintList(ColorStateList.valueOf(Color.rgb(245, 166, 35)));
+        actionSecondary.setAllCaps(false);
+        actionSecondary.setTextColor(Color.WHITE);
+        actionSecondary.setBackgroundTintList(ColorStateList.valueOf(Color.rgb(49, 55, 72)));
+        buttons.addView(actionPrimary, new LinearLayout.LayoutParams(0, dp(52), 1));
+        LinearLayout.LayoutParams secondaryParams = new LinearLayout.LayoutParams(0, dp(52), 1);
         secondaryParams.setMarginStart(dp(8));
         buttons.addView(actionSecondary, secondaryParams);
         actionBar.addView(buttons);
@@ -199,7 +215,7 @@ public class MainActivity extends Activity {
         prefs.edit().remove("active_account_id").apply();
         leaveLocalApp();
         clearVueSession(() -> {
-            actionText.setText("Log bij Vue in als " + name + ". Tik daarna hieronder op ‘Account opslaan’.");
+            actionText.setText("Log via de officiële Vue-site in als " + name + ". Tik daarna op de oranje knop ‘Account opslaan’.");
             actionPrimary.setEnabled(true);
             actionPrimary.setText("Account opslaan");
             actionSecondary.setText("Annuleren");
@@ -631,6 +647,11 @@ public class MainActivity extends Activity {
                 intent.putExtra(Intent.EXTRA_TEXT, value);
                 startActivity(Intent.createChooser(intent, "Groepscode delen"));
             });
+        }
+
+        @JavascriptInterface
+        public void showGroupNotice(String value) {
+            runOnUiThread(() -> Toast.makeText(MainActivity.this, value, Toast.LENGTH_LONG).show());
         }
     }
 

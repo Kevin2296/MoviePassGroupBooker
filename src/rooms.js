@@ -129,7 +129,7 @@ export class RoomStore {
     return { room: publicRoom(room, participant.id) };
   }
 
-  update({ code, token: participantToken, action, showing, status, seat }) {
+  update({ code, token: participantToken, action, showing, status, seat, participantId }) {
     const room = this.get(code);
     const participant = this.authorize(room, participantToken);
     if (action === 'set_showing') {
@@ -145,6 +145,12 @@ export class RoomStore {
       participant.status = allowed.has(status) ? status : 'verbonden';
       participant.seat = String(seat || '').trim().slice(0, 20);
       participant.updatedAt = Date.now();
+    } else if (action === 'remove_participant') {
+      if (participant.role !== 'host') throw new Error('Alleen de groepsleider kan iemand verwijderen.');
+      const target = room.participants.get(String(participantId || ''));
+      if (!target) throw new Error('Deze deelnemer zit niet meer in de groep.');
+      if (target.role === 'host') throw new Error('De groepsleider kan zichzelf niet verwijderen.');
+      room.participants.delete(target.id);
     } else if (action === 'leave') {
       if (participant.role === 'host') this.rooms.delete(room.code);
       else {

@@ -4,7 +4,9 @@ android/.gradle/
 android/app/build/
 android/build/
 android-build-tools/
+android/signing/
 android/release.jks
+*.pem
 *.keystore
 *.jks
 *.idsig

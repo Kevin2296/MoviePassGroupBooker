@@ -108,7 +108,7 @@ function servePublicConfig(res) {
 const server = createServer(async (req, res) => {
   try {
     if (req.method === 'GET' && req.url === '/api/health') {
-      return json(res, 200, { ok: true, version: '0.6.0', mode: 'public-beta', storage: 'temporary' });
+      return json(res, 200, { ok: true, version: '0.7.0', mode: 'public-beta', storage: 'temporary' });
     }
 
     if (req.method === 'GET' && req.url === '/config.js') {

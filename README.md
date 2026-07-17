@@ -1,4 +1,4 @@
-# Movie Pass Groepsboeker 0.6.0
+# Movie Pass Groepsboeker 0.7.0
 
 Onafhankelijke Android- en webassistent om met meerdere bezoekers dezelfde actuele Vue-voorstelling te openen. Iedere Movie Pass blijft een afzonderlijke bestelling op de officiële Vue-website.
 
@@ -13,6 +13,17 @@ Onafhankelijke Android- en webassistent om met meerdere bezoekers dezelfde actue
 - Movie Pass- en gewone-ticketdeelnemers combineren.
 - Live tonen wie verbonden, klaar, aan het boeken of afgerond is.
 - Groepen automatisch na twaalf uur verwijderen.
+
+## Zo boek je samen
+
+1. Installeer de Android-app op ieder toestel en koppel per persoon het eigen Vue-account.
+2. Eén persoon maakt een groep en deelt de zescijferige code.
+3. De anderen kiezen **Deelnemen met code**. Alleen de groepsleider kiest daarna bioscoop, dag, film en tijd.
+4. De groepsleider kiest **Voorstelling klaarzetten** en daarna **Start samen boeken**.
+5. Op ieder toestel verschijnt **Open mijn Vue-bestelling**. Iedere Movie Pass blijft een afzonderlijke officiële Vue-order.
+6. Spreek vooraf een eerste stoel af, kies bij de volgende orders de stoel ernaast en meld iedere afgeronde bestelling in de app.
+
+De groepsleider kan een deelnemer uit de groep verwijderen. Wanneer iemand begint met boeken, zien de andere deelnemers die de groepsapp open hebben daar direct een melding van.
 
 Vue-wachtwoorden, cookies en betaalgegevens worden niet naar de synchronisatieserver gestuurd. Gekoppelde Vue-sessies worden met Android Keystore en AES-GCM versleuteld op het eigen toestel opgeslagen.
 

@@ -1,4 +1,4 @@
-const CACHE = 'passboeker-v6-0';
+const CACHE = 'passboeker-v7-0';
 const ASSETS = ['/', '/styles.css', '/app.js', '/config.js', '/support.js', '/privacy.html', '/support.html', '/icon.svg', '/manifest.webmanifest'];
 
 self.addEventListener('install', event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS))));

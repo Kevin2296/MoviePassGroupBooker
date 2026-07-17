@@ -50,3 +50,24 @@ test('verwijdert een deelnemer direct bij het verlaten van de groep', () => {
   assert.deepEqual(store.update({ code: host.room.code, token: guest.token, action: 'leave' }), { left: true });
   assert.equal(store.read({ code: host.room.code, token: host.token }).room.participants.length, 1);
 });
+
+test('alleen de groepsleider kan een deelnemer verwijderen', () => {
+  const store = new RoomStore();
+  const host = store.create({ name: 'Kevin' });
+  const guest = store.join({ code: host.room.code, name: 'Vriend' });
+  const guestId = guest.room.me;
+  assert.throws(() => store.update({
+    code: host.room.code,
+    token: guest.token,
+    action: 'remove_participant',
+    participantId: host.room.me
+  }), /groepsleider/);
+  const updated = store.update({
+    code: host.room.code,
+    token: host.token,
+    action: 'remove_participant',
+    participantId: guestId
+  });
+  assert.equal(updated.room.participants.length, 1);
+  assert.throws(() => store.read({ code: host.room.code, token: guest.token }), /uitnodiging/);
+});
