@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#11141d">
+  <meta name="description" content="Boek losse Vue-orders met meerdere gekoppelde Movie Pass-accounts.">
+  <title>Movie Pass Groepsboeker</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./config.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#top" aria-label="Movie Pass Groepsboeker">
+      <span class="brand-mark" aria-hidden="true">MP</span>
+      <span><strong>Movie Pass</strong><small>Groepsboeker</small></span>
+    </a>
+    <span class="mode"><i></i> Groepsmodus</span>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">SAMEN NAAR DE FILM</p>
+        <h1>Meerdere accounts.<br><span>Eén voorstelling.</span></h1>
+        <p class="intro">Maak een groep, nodig vrienden uit en open op ieder toestel dezelfde Vue-voorstelling met het eigen Movie Pass-account.</p>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="ticket ticket-back">SAMEN<br>FILM</div>
+        <div class="ticket ticket-front">MOVIE<br>PASS</div>
+      </div>
+    </section>
+
+    <section class="card group-card">
+      <div class="section-heading">
+        <span class="step">1</span>
+        <div><h2>Boekingsgroep</h2><p>Eén persoon kiest de voorstelling; iedereen gebruikt zijn eigen Vue-login.</p></div>
+      </div>
+      <div id="group-setup">
+        <div class="form-grid group-fields">
+          <label class="wide" id="sync-server-field"><span>Synchronisatieserver</span><input id="sync-server" inputmode="url" autocomplete="url" placeholder="https://films.jouwdomein.nl"></label>
+          <label><span>Jouw naam</span><input id="group-name" autocomplete="name" placeholder="Kevin"></label>
+          <label><span>Ticket</span><select id="group-ticket"><option value="moviepass">Movie Pass</option><option value="regular">Gewoon ticket</option></select></label>
+          <label><span>Groepscode</span><input id="join-code" maxlength="6" autocapitalize="characters" placeholder="ABC234"></label>
+        </div>
+        <div class="group-actions">
+          <button class="button primary" type="button" id="create-room">Nieuwe groep maken</button>
+          <button class="button secondary" type="button" id="join-room">Deelnemen met code</button>
+        </div>
+        <p class="helper" id="sync-mode">De server ontvangt geen Vue-login, wachtwoord, cookies of betaalgegevens.</p>
+      </div>
+      <div id="group-live" hidden>
+        <div class="room-banner">
+          <div><small>GROEPSCODE</small><strong id="room-code"></strong></div>
+          <button class="button secondary" id="share-room" type="button">Code delen</button>
+        </div>
+        <p id="room-showing" class="room-showing">De groepsleider kiest zo de voorstelling.</p>
+        <div id="room-people" class="room-people"></div>
+        <div class="group-actions">
+          <button class="button secondary" id="leave-room" type="button">Groep verlaten</button>
+          <button class="button secondary" id="room-done" type="button" hidden>Mijn boeking is afgerond</button>
+          <button class="button primary" id="room-book" type="button" hidden>Open mijn Vue-boeking</button>
+        </div>
+      </div>
+      <p id="group-error" class="error" role="alert" hidden></p>
+    </section>
+
+    <section class="card">
+      <div class="section-heading">
+        <span class="step">2</span>
+        <div><h2>Vue-accounts</h2><p>Voor testen is één account genoeg; later kun je er meer koppelen.</p></div>
+      </div>
+      <div id="accounts" class="accounts"></div>
+      <div class="account-add">
+        <label><span>Naam pashouder</span><input id="new-account-name" autocomplete="name" placeholder="Bijvoorbeeld: Kevin"></label>
+        <button class="button secondary" type="button" id="add-account"><span>＋</span> Account koppelen</button>
+      </div>
+      <p id="account-help" class="helper">Je logt in op de officiële website van Vue. Deze app ziet of bewaart je wachtwoord niet.</p>
+    </section>
+
+    <form id="booking-form" novalidate>
+      <section class="card">
+        <div class="section-heading">
+          <span class="step">3</span>
+          <div><h2>Voorstelling</h2><p>Kies een dag en daarna een echte Vue-vertoning.</p></div>
+        </div>
+
+        <div class="form-grid">
+          <label class="wide"><span>Bioscoop</span>
+            <select name="cinema" required>
+              <option value="Kerkrade" selected>Vue Kerkrade</option>
+              <option>Alkmaar</option><option>Alphen aan den Rijn</option><option>Amersfoort</option>
+              <option>Amsterdam</option><option>Apeldoorn</option><option>Arnhem</option><option>Den Bosch</option>
+              <option>Deventer</option><option>Doetinchem</option><option>Eindhoven</option><option>Enschede</option>
+              <option>Gorinchem</option><option>Heerhugowaard</option><option>Hilversum</option><option>Hoogeveen</option>
+              <option>Hoogezand</option><option>Hoorn</option><option>Nijmegen</option><option>Purmerend</option><option>Vlaardingen</option>
+            </select>
+          </label>
+          <label class="wide"><span>Dag</span><select name="date" id="date-select" required></select></label>
+          <label class="wide"><span>Stoelvoorkeur</span>
+            <select name="seatPreference">
+              <option value="center" selected>Midden van de zaal</option>
+              <option value="back">Achterin</option>
+              <option value="front">Voorin</option>
+              <option value="aisle">Aan het gangpad</option>
+            </select>
+          </label>
+        </div>
+        <div class="program-head">
+          <strong>Films en tijden</strong>
+          <button class="refresh-program" id="refresh-program" type="button">Vernieuwen</button>
+        </div>
+        <div id="program-status" class="program-status" role="status">Programma wordt geladen…</div>
+        <div id="program" class="program" aria-live="polite"></div>
+        <input type="hidden" name="sessionId" id="session-id">
+        <p class="helper">De gekozen Vue-sessie wordt voor ieder account opnieuw geopend. Kies bij Vue per order de naastgelegen stoel.</p>
+      </section>
+
+      <aside class="privacy-note">
+        <span aria-hidden="true">⌁</span>
+        <p><strong>Versleuteld op dit toestel</strong>Vue-sessies blijven lokaal in de Android-app. Wachtwoorden, pincodes en betaalgegevens worden niet door deze app opgeslagen.</p>
+      </aside>
+
+      <button class="button primary" type="submit">Voorstelling klaarzetten <span>→</span></button>
+      <p id="form-error" class="error" role="alert" hidden></p>
+    </form>
+
+    <section id="result" class="card result" hidden aria-live="polite">
+      <div class="result-head">
+        <div><p class="eyebrow">BOEKINGSRONDE</p><h2 id="result-title"></h2></div>
+        <span class="status">Klaar om te starten</span>
+      </div>
+      <div id="order-list" class="order-list"></div>
+      <p class="warning"><strong>Jij houdt de controle.</strong> Vue kan een toeslag, betaling of beveiligingscontrole tonen. De app rondt zo'n definitieve stap niet zonder jouw actie af.</p>
+      <div class="result-actions">
+        <button class="button secondary" id="copy-plan" type="button">Plan kopiëren</button>
+        <button class="button primary" id="open-orders" type="button">Open eerste Vue-order <span>↗</span></button>
+      </div>
+    </section>
+  </main>
+
+  <template id="account-template">
+    <article class="account-card">
+      <span class="account-avatar" aria-hidden="true"></span>
+      <div><strong class="account-name"></strong><small class="account-status"></small></div>
+      <button class="remove-account" type="button">Verwijderen</button>
+    </article>
+  </template>
+
+  <footer><a href="./privacy.html">Privacy</a> · <a href="./support.html">Support</a> · Onafhankelijke boekingsassistent · Niet verbonden aan Vue Cinemas</footer>
+  <script defer src="./app.js"></script>
+</body>
+</html>

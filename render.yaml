@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: moviepass-groepsboeker-sync
+    runtime: docker
+    plan: free
+    region: frankfurt
+    healthCheckPath: /api/health
+    autoDeployTrigger: checksPass
+    maxShutdownDelaySeconds: 30
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: TRUST_PROXY
+        value: "true"
+      - key: GITHUB_REPOSITORY_URL
+        sync: false

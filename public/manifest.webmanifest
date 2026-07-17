@@ -1,0 +1,12 @@
+{
+  "name": "Movie Pass Groepsboeker",
+  "short_name": "Passboeker",
+  "description": "Open losse Vue-orders met meerdere gekoppelde Movie Pass-accounts.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b0d13",
+  "theme_color": "#11141d",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

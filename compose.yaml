@@ -1,0 +1,9 @@
+services:
+  moviepass-sync:
+    build: .
+    container_name: moviepass-sync
+    restart: unless-stopped
+    ports:
+      - "4173:4173"
+    environment:
+      PORT: "4173"

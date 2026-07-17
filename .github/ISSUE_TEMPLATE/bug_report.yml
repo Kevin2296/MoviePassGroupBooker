@@ -1,0 +1,33 @@
+name: Probleem melden
+description: Meld een reproduceerbaar probleem zonder account- of betaalgegevens.
+title: "[Bug] "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Deel nooit een Vue-wachtwoord, cookie, QR-ticket of betaalgegeven.
+  - type: input
+    id: version
+    attributes:
+      label: Appversie
+      placeholder: 0.6.0
+    validations:
+      required: true
+  - type: input
+    id: android
+    attributes:
+      label: Android-versie en toestel
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Stappen om het probleem te reproduceren
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: Verwacht en werkelijk resultaat
+    validations:
+      required: true

@@ -1,0 +1,39 @@
+plugins {
+    id 'com.android.application'
+}
+
+def releaseKeystorePath = System.getenv('ANDROID_KEYSTORE_PATH')
+def releaseSigningAvailable = releaseKeystorePath && System.getenv('ANDROID_KEYSTORE_PASSWORD') && System.getenv('ANDROID_KEY_ALIAS') && System.getenv('ANDROID_KEY_PASSWORD')
+
+android {
+    namespace 'nl.kevin.moviepass'
+    compileSdk 35
+    buildToolsVersion '35.0.0'
+
+    defaultConfig {
+        applicationId 'nl.kevin.moviepass'
+        minSdk 26
+        targetSdk 35
+        versionCode 8
+        versionName '0.6.0'
+    }
+
+    signingConfigs {
+        if (releaseSigningAvailable) {
+            release {
+                storeFile file(releaseKeystorePath)
+                storePassword System.getenv('ANDROID_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('ANDROID_KEY_ALIAS')
+                keyPassword System.getenv('ANDROID_KEY_PASSWORD')
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            if (releaseSigningAvailable) signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
